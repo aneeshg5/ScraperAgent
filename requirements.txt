@@ -1,45 +1,53 @@
-# Core FastAPI and web framework
+# Core FastAPI and web dependencies
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
+python-multipart==0.0.6
 python-dotenv==1.0.0
-pydantic==2.5.0
-requests==2.31.0
 
-# GPU Acceleration & Deep Learning
-torch>=2.1.0
-torchvision>=0.16.0
-transformers>=4.30.0
-accelerate>=0.21.0
-
-# LangChain Ecosystem  
-langchain==0.1.0
-langchain-community==0.0.10
-langchain-experimental>=0.0.50
-langchain-core>=0.1.0
-
-# Browser Automation
+# Web scraping and browser automation
 playwright==1.40.0
 beautifulsoup4==4.12.2
+requests==2.31.0
 lxml==4.9.3
 
-# Vision & Processing
-Pillow==10.1.0
-opencv-python>=4.8.0
-numpy>=1.24.0
+# AI and ML dependencies
+openai==1.3.8
+langchain==0.1.0
+langchain-community==0.0.12
 
-# Database & API
-aiosqlite==0.19.0
-httpx>=0.25.0
+# Data processing and validation
+pydantic==2.5.0
 aiofiles==23.2.1
-python-multipart==0.0.6
 
-# Utilities
-pandas>=2.1.0
-structlog>=23.1.0
-psutil>=5.9.0
-spacy>=3.6.0
-nltk>=3.8.0
+# Database and memory
+aiosqlite==0.19.0
 
-# Development
+# Image processing
+Pillow==10.1.0
+
+# Logging and utilities
+loguru==0.7.2
+
+# HTTP client with async support
+httpx==0.25.2
+
+# Data formatting and Excel support
+pandas==2.1.4
+openpyxl==3.1.2
+
+# Enhanced data processing
+numpy==1.24.4
+
+# Testing dependencies (optional)
 pytest==7.4.3
 pytest-asyncio==0.21.1
+
+# Development utilities
+black==23.11.0
+isort==5.12.0
+
+# Additional web parsing
+html5lib==1.1
+
+# Date parsing utilities
+python-dateutil==2.8.2

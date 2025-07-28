@@ -4,7 +4,7 @@ Handles web content extraction and screenshot capture
 """
 import asyncio
 import logging
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 import os
 from urllib.parse import urlparse
 import base64
@@ -13,6 +13,7 @@ import sys
 import platform
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 from bs4 import BeautifulSoup
@@ -30,7 +31,7 @@ _browser_context: Optional[BrowserContext] = None
 _playwright_instance = None
 
 
-async def initialize_browser() -> None:
+async def initialize_browser() -> bool:
     """
     Robust browser initialization with multiple fallback strategies
     Specifically designed to handle Windows Python 3.13 compatibility issues
@@ -39,7 +40,7 @@ async def initialize_browser() -> None:
     
     if _browser and _browser_context:
         logger.info("✅ Browser already initialized")
-        return
+        return True
     
     logger.info("🔧 Initializing browser automation...")
     
@@ -51,29 +52,30 @@ async def initialize_browser() -> None:
     
     # Strategy 1: Try standard async initialization first
     if await _try_standard_initialization():
-        return
+        return True
     
     # Strategy 2: For Windows Python 3.13+, try event loop policy fix
     if system == "Windows" and python_version >= (3, 13):
         logger.info("🔄 Trying Windows-specific event loop policy fix...")
         if await _try_windows_event_loop_fix():
-            return
+            return True
     
     # Strategy 3: Try thread-based initialization
     logger.info("🔄 Trying thread-based initialization...")
     if await _try_thread_based_initialization():
-        return
+        return True
     
     # Strategy 4: Try with minimal browser options
     logger.info("🔄 Trying minimal browser configuration...")
     if await _try_minimal_browser_config():
-        return
+        return True
     
     # All strategies failed - log detailed failure info
     logger.warning("❌ All browser initialization strategies failed")
     logger.warning("🔄 Application will use requests-based fallback for web content")
     logger.warning("⚠️  Screenshots and JavaScript rendering will not be available")
     logger.info("💡 This is expected on Windows Python 3.13 - full functionality available on Linux/Brev platform")
+    return False
 
 
 async def _try_standard_initialization() -> bool:
@@ -306,117 +308,289 @@ async def cleanup_browser() -> None:
         _playwright_instance = None
 
 
-async def _extract_fallback_content(urls: List[str]) -> List[str]:
+async def extract_web_data(urls: List[str], capture_screenshots: bool = True, extract_media: bool = False) -> Tuple[List[Dict[str, Any]], List[bytes]]:
     """
-    Fallback content extraction using requests when browser automation fails
-    """
-    logger.info("🔄 Using requests-based fallback for content extraction")
-    contents = []
-    
-    for url in urls:
-        try:
-            logger.info(f"📄 Fetching content from: {url}")
-            
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            
-            # Parse with BeautifulSoup
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Remove script and style elements
-            for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
-                script.decompose()
-            
-            # Extract text content
-            text_content = soup.get_text()
-            
-            # Clean up text
-            lines = (line.strip() for line in text_content.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            text = ' '.join(chunk for chunk in chunks if chunk)
-            
-            # Limit content length
-            if len(text) > 5000:
-                text = text[:5000] + "... [content truncated]"
-            
-            contents.append(text)
-            logger.info(f"✅ Successfully extracted content from: {url}")
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to extract content from {url}: {str(e)}")
-            contents.append("")
-    
-    return contents
-
-
-async def extract_web_data(
-    urls: List[str], 
-    capture_screenshots: bool = True
-) -> Tuple[List[str], List[bytes]]:
-    """
-    Extract web content and capture screenshots from multiple URLs
+    Extract comprehensive web data including text, screenshots, and media
     
     Args:
         urls: List of URLs to process
         capture_screenshots: Whether to capture screenshots
+        extract_media: Whether to extract individual media files
         
     Returns:
-        Tuple of (web_contents, screenshots)
+        Tuple of (web_contents, screenshot_data)
     """
-    logger.info(f"🌐 Starting web data extraction for {len(urls)} URLs")
-    
-    # Check if browser is available
-    if not _browser or not _browser_context:
-        logger.info("🔄 Browser not available, attempting initialization...")
-        try:
-            await initialize_browser()
-        except Exception as e:
-            logger.warning(f"⚠️ Browser initialization failed: {str(e)}")
-            logger.info("🔄 Using fallback content extraction without browser")
-            return await _extract_fallback_content(urls), []
-    
-    # If browser is still not available, use fallback
-    if not _browser or not _browser_context:
-        logger.info("🔄 Using requests-based fallback for content extraction")
-        return await _extract_fallback_content(urls), []
-    
     web_contents = []
     screenshots = []
     
-    # Process URLs concurrently (with reasonable limit)
-    semaphore = asyncio.Semaphore(3)  # Limit concurrent pages
+    browser_available = await initialize_browser()
     
-    async def process_url(url: str) -> Tuple[str, Optional[bytes]]:
-        async with semaphore:
-            return await _extract_single_url(url, capture_screenshots)
-    
-    # Execute all URL processing tasks
-    tasks = [process_url(url) for url in urls]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-    
-    # Process results
-    for i, result in enumerate(results):
-        if isinstance(result, Exception):
-            logger.error(f"❌ Failed to process URL {urls[i]}: {str(result)}")
-            web_contents.append("")
-            screenshots.append(None)
-        else:
-            content, screenshot = result
-            web_contents.append(content)
-            screenshots.append(screenshot)
-    
-    # Filter out None screenshots
-    screenshots = [s for s in screenshots if s is not None]
-    
-    logger.info(f"✅ Extracted content from {len([c for c in web_contents if c])} URLs")
-    if capture_screenshots:
-        logger.info(f"📸 Captured {len(screenshots)} screenshots")
+    if browser_available and _browser:
+        logger.info("🌐 Using Playwright for enhanced data extraction")
+        
+        try:
+            for url in urls:
+                try:
+                    page = await _browser.new_page()
+                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    
+                    # Wait for dynamic content
+                    await page.wait_for_timeout(2000)
+                    
+                    # Extract text content
+                    text_content = await page.inner_text("body")
+                    
+                    # Get page HTML for media extraction
+                    html_content = await page.content() if extract_media else ""
+                    
+                    # Extract media files if requested
+                    media_files = []
+                    if extract_media:
+                        media_files = await extract_media_from_page(page, url, html_content)
+                    
+                    web_content = {
+                        "url": url,
+                        "text": text_content,
+                        "html": html_content if extract_media else "",
+                        "media_files": media_files,
+                        "title": await page.title(),
+                        "extracted_at": datetime.now().isoformat()
+                    }
+                    
+                    web_contents.append(web_content)
+                    
+                    # Capture screenshot if requested
+                    if capture_screenshots:
+                        try:
+                            screenshot = await page.screenshot(
+                                type='png',
+                                full_page=True
+                            )
+                            screenshots.append(screenshot)
+                            logger.info(f"📸 Screenshot captured for {url}")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Screenshot failed for {url}: {str(e)}")
+                            screenshots.append(b"")
+                    
+                    await page.close()
+                    logger.info(f"✅ Successfully processed {url}")
+                    
+                except Exception as e:
+                    logger.error(f"❌ Failed to process {url}: {str(e)}")
+                    # Add fallback entry
+                    fallback_content = await _extract_with_requests(url)
+                    if fallback_content:
+                        web_contents.append(fallback_content)
+                    if capture_screenshots:
+                        screenshots.append(b"")
+                        
+        except Exception as e:
+            logger.error(f"❌ Browser processing failed: {str(e)}")
+            
+    else:
+        logger.warning("⚠️ Browser not available, using requests fallback")
+        for url in urls:
+            content = await _extract_with_requests(url)
+            if content:
+                # Extract media from HTML if requested
+                if extract_media and content.get('html'):
+                    from app.utils.formatters import MediaExtractor
+                    extractor = MediaExtractor()
+                    images = extractor.extract_images_from_html(content['html'], url)
+                    videos = extractor.extract_videos_from_html(content['html'], url)
+                    content['media_files'] = images + videos
+                else:
+                    content['media_files'] = []
+                
+                web_contents.append(content)
+            
+            if capture_screenshots:
+                screenshots.append(b"")  # Empty screenshot for fallback
     
     return web_contents, screenshots
+
+
+async def extract_media_from_page(page, url: str, html_content: str) -> List[Dict[str, Any]]:
+    """
+    Extract individual media files from a web page using both Playwright and HTML parsing
+    
+    Args:
+        page: Playwright page object
+        url: Page URL
+        html_content: Page HTML content
+        
+    Returns:
+        List of media file metadata
+    """
+    try:
+        from app.utils.formatters import MediaExtractor
+        media_files = []
+        
+        # Extract images using HTML parsing
+        extractor = MediaExtractor()
+        images = extractor.extract_images_from_html(html_content, url)
+        videos = extractor.extract_videos_from_html(html_content, url)
+        
+        # Enhanced image extraction using Playwright for better accuracy
+        try:
+            img_elements = await page.query_selector_all('img')
+            
+            for img in img_elements:
+                try:
+                    src = await img.get_attribute('src')
+                    alt = await img.get_attribute('alt') or ''
+                    
+                    if not src or src.startswith('data:'):
+                        continue
+                    
+                    # Resolve relative URLs
+                    from urllib.parse import urljoin
+                    full_url = urljoin(url, src)
+                    
+                    # Skip small icons and placeholder images
+                    try:
+                        width = await img.get_attribute('width')
+                        height = await img.get_attribute('height')
+                        
+                        if width and height:
+                            w, h = int(width), int(height)
+                            if w < 50 or h < 50:  # Skip very small images
+                                continue
+                    except (ValueError, TypeError):
+                        pass
+                    
+                    # Check if already extracted by HTML parser
+                    already_exists = any(
+                        existing['media_url'] == full_url 
+                        for existing in images
+                    )
+                    
+                    if not already_exists:
+                        image_data = {
+                            'url': url,
+                            'media_url': full_url,
+                            'media_type': 'image',
+                            'filename': full_url.split('/')[-1].split('?')[0],  # Remove query params
+                            'alt_text': alt,
+                            'mime_type': f"image/{full_url.split('.')[-1].lower()}" if '.' in full_url else 'image/unknown'
+                        }
+                        
+                        # Try to get actual dimensions from the element
+                        try:
+                            bbox = await img.bounding_box()
+                            if bbox:
+                                image_data['width'] = int(bbox['width'])
+                                image_data['height'] = int(bbox['height'])
+                        except:
+                            pass
+                        
+                        images.append(image_data)
+                
+                except Exception as e:
+                    logger.debug(f"Failed to process image element: {str(e)}")
+                    continue
+        
+        except Exception as e:
+            logger.warning(f"⚠️ Enhanced image extraction failed: {str(e)}")
+        
+        # Combine all media files
+        media_files = images + videos
+        
+        # Extract document links (PDFs, docs, etc.)
+        try:
+            doc_links = await page.query_selector_all('a[href*=".pdf"], a[href*=".doc"], a[href*=".docx"], a[href*=".xlsx"], a[href*=".pptx"]')
+            
+            for link in doc_links:
+                try:
+                    href = await link.get_attribute('href')
+                    text = await link.inner_text()
+                    
+                    if href:
+                        from urllib.parse import urljoin
+                        full_url = urljoin(url, href)
+                        
+                        # Determine file type
+                        file_ext = href.split('.')[-1].lower()
+                        mime_types = {
+                            'pdf': 'application/pdf',
+                            'doc': 'application/msword',
+                            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                        }
+                        
+                        media_files.append({
+                            'url': url,
+                            'media_url': full_url,
+                            'media_type': 'document',
+                            'filename': href.split('/')[-1].split('?')[0],
+                            'alt_text': text.strip(),
+                            'mime_type': mime_types.get(file_ext, 'application/octet-stream')
+                        })
+                
+                except Exception as e:
+                    logger.debug(f"Failed to process document link: {str(e)}")
+                    continue
+        
+        except Exception as e:
+            logger.warning(f"⚠️ Document extraction failed: {str(e)}")
+        
+        logger.info(f"🎭 Extracted {len(media_files)} media files from {url}")
+        return media_files
+        
+    except Exception as e:
+        logger.error(f"❌ Media extraction failed for {url}: {str(e)}")
+        return []
+
+
+async def _extract_with_requests(url: str) -> Optional[Dict[str, Any]]:
+    """
+    Fallback method to extract web content using requests and BeautifulSoup
+    Enhanced with media extraction capabilities
+    
+    Args:
+        url: URL to extract content from
+        
+    Returns:
+        Dictionary containing extracted content and media files
+    """
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove script and style elements
+        for script in soup(["script", "style"]):
+            script.decompose()
+        
+        # Extract text content
+        text_content = soup.get_text()
+        
+        # Clean up text
+        lines = (line.strip() for line in text_content.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        text_content = ' '.join(chunk for chunk in chunks if chunk)
+        
+        # Get page title
+        title = soup.title.string if soup.title else ""
+        
+        return {
+            "url": url,
+            "text": text_content,
+            "html": str(soup),
+            "media_files": [],  # Will be populated by caller if needed
+            "title": title,
+            "extracted_at": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Requests fallback failed for {url}: {str(e)}")
+        return None
 
 
 async def _extract_single_url(

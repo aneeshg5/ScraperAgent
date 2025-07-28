@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os
 
-from app.agent.core import multimodal_research_agent
+from app.agent.core import multimodal_research_agent, autonomous_research_agent
 from app.agent.vision import analyze_image_upload
 from app.models.schemas import (
     BrowseRequest, 
@@ -156,33 +156,52 @@ async def health_check():
 @app.post("/agent/research", response_model=AgentResponse)
 async def research_with_agent(request: BrowseRequest, background_tasks: BackgroundTasks):
     """
-    Main endpoint for multimodal web research
+    Enhanced endpoint for multimodal web research with structured data and format flexibility
     
-    Orchestrates browser automation, content extraction, vision analysis,
-    and NVIDIA Nemotron reasoning to provide comprehensive research insights.
+    Supports:
+    - Multiple output formats (text, CSV, Excel, JSON, HTML table)
+    - Individual media extraction (images, videos, documents)
+    - Structured data extraction with AI-powered field detection
+    - Full-page screenshots and vision analysis
+    - NVIDIA Nemotron reasoning and synthesis
     """
     start_processing_time = time.time()
     
     try:
         logger.info(f"🔍 Starting research for query: {request.query}")
         logger.info(f"📊 Analyzing {len(request.urls)} URLs")
+        logger.info(f"🎨 Output format: {request.output_format.value}")
+        logger.info(f"🎭 Media extraction: {request.extract_media}")
         
-        # Execute the multimodal research agent
+        # Execute the enhanced multimodal research agent
         result = await multimodal_research_agent(
             query=request.query,
             urls=[str(url) for url in request.urls],
             max_tokens=request.max_tokens,
-            include_screenshots=request.include_screenshots
+            include_screenshots=request.include_screenshots,
+            output_format=request.output_format,
+            extract_media=request.extract_media,
+            structured_fields=request.structured_fields
         )
         
         processing_time = time.time() - start_processing_time
         logger.info(f"✅ Research completed in {processing_time:.2f} seconds")
+        
+        if result.get('structured_data') and result['structured_data'].get('total_records', 0) > 0:
+            logger.info(f"📊 Extracted {result['structured_data']['total_records']} structured records")
+        
+        if result.get('media_files'):
+            logger.info(f"🎭 Found {len(result['media_files'])} media files")
         
         return AgentResponse(
             result=result["analysis"],
             sources_analyzed=result["sources_analyzed"],
             vision_insights=result.get("vision_insights"),
             screenshots=result.get("screenshots"),
+            structured_data=result.get("structured_data"),
+            formatted_output=result.get("formatted_output"),
+            media_files=result.get("media_files"),
+            output_format=result.get("output_format", request.output_format),
             processing_time=processing_time
         )
         
@@ -192,6 +211,48 @@ async def research_with_agent(request: BrowseRequest, background_tasks: Backgrou
             status_code=500,
             detail=f"Research agent failed: {str(e)}"
         )
+
+
+@app.post("/agent/autonomous-research", response_model=AgentResponse)
+async def autonomous_research(request: BrowseRequest, background_tasks: BackgroundTasks):
+    """
+    Autonomous research endpoint with enhanced capabilities
+    Combines autonomous decision-making with structured data extraction and format flexibility
+    """
+    start_processing_time = time.time()
+    try:
+        logger.info(f"🤖 Starting autonomous research for: {request.query}")
+        logger.info(f"🎯 Agent will autonomously analyze {len(request.urls)} URLs")
+        logger.info(f"🎨 Output format: {request.output_format.value}")
+        
+        result = await autonomous_research_agent(
+            research_goal=request.query,
+            starting_urls=[str(url) for url in request.urls],
+            max_iterations=8,
+            max_tokens=request.max_tokens,
+            output_format=request.output_format,
+            extract_media=request.extract_media,
+            structured_fields=request.structured_fields
+        )
+        
+        processing_time = time.time() - start_processing_time
+        logger.info(f"✅ Autonomous research completed in {processing_time:.2f} seconds")
+        logger.info(f"🤖 Agent took {result.get('autonomous_actions_taken', 0)} autonomous actions")
+        
+        return AgentResponse(
+            result=result["analysis"],
+            sources_analyzed=[data.get("source_url", "") for data in result.get("collected_data", [])],
+            vision_insights=[f"Autonomous action: {action}" for action in result.get("action_log", [])],
+            screenshots=result.get("screenshots"),
+            structured_data=result.get("structured_data"),
+            formatted_output=result.get("formatted_output"),
+            media_files=result.get("media_files"),
+            output_format=result.get("output_format", request.output_format),
+            processing_time=processing_time
+        )
+    except Exception as e:
+        logger.error(f"❌ Autonomous research failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Autonomous research agent failed: {str(e)}")
 
 
 @app.post("/agent/vision", response_model=VisionAnalysisResponse)

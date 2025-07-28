@@ -560,6 +560,703 @@
                 transform: translateY(0);
             }
         }
+
+        /* Submit Buttons Layout */
+        .submit-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .submit-buttons .submit-btn {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        /* Autonomous Research Button */
+        .autonomous-btn {
+            background: linear-gradient(135deg, #6B46C1 0%, #9333EA 100%) !important;
+            border: 2px solid rgba(147, 51, 234, 0.3) !important;
+        }
+        
+        .autonomous-btn:hover {
+            background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
+            border-color: rgba(168, 85, 247, 0.5) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
+        }
+        
+        .autonomous-btn:disabled {
+            opacity: 0.6;
+            background: linear-gradient(135deg, #6B46C1 0%, #9333EA 100%) !important;
+        }
+
+        /* New styles for autonomous research results */
+        .autonomous-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(118, 185, 0, 0.2);
+        }
+
+        .autonomous-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #76b900;
+            margin-bottom: 5px;
+        }
+
+        .autonomous-subtitle {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+
+        .autonomous-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .actions-title {
+            font-weight: 600;
+            color: #76b900;
+            margin-bottom: 15px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #76b900;
+        }
+
+        .action-number {
+            font-weight: 600;
+            color: #9acd32;
+            font-size: 0.9rem;
+        }
+
+        .action-description {
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+
+        .autonomous-note {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-analyzed-badge {
+            background: linear-gradient(45deg, #76b900, #9acd32);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 10px;
+        }
+        
+        /* Autonomous Indicator */
+        .autonomous-indicator {
+            background: linear-gradient(45deg, #6B46C1, #9333EA);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        /* Enhanced autonomous screenshot styling */
+        .autonomous-screenshot {
+            border: 2px solid rgba(147, 51, 234, 0.3);
+            background: linear-gradient(135deg, rgba(107, 70, 193, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+        }
+        
+        .autonomous-screenshot:hover {
+            border-color: rgba(147, 51, 234, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.2);
+        }
+
+        /* New styles for enhanced results */
+        .enhanced-results-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .enhanced-results-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(118, 185, 0, 0.3);
+        }
+
+        .enhanced-results-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #76b900;
+        }
+
+        .enhanced-processing-time {
+            background: rgba(118, 185, 0, 0.2);
+            color: #76b900;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .enhanced-analysis-content {
+            line-height: 1.8;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+
+        .enhanced-analysis-content h1, .enhanced-analysis-content h2, .enhanced-analysis-content h3 {
+            color: #76b900;
+            margin: 25px 0 15px 0;
+        }
+
+        .enhanced-analysis-content ul, .enhanced-analysis-content ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-analysis-content li {
+            margin-bottom: 8px;
+        }
+
+        .enhanced-analysis-content strong {
+            color: #ffffff;
+        }
+
+        .enhanced-sources-analyzed {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-sources-title {
+            font-weight: 600;
+            color: #76b900;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-source-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #76b900;
+        }
+
+        .enhanced-source-url {
+            color: #9acd32;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .enhanced-source-url:hover {
+            text-decoration: underline;
+        }
+
+        /* Enhanced Screenshots Section */
+        .enhanced-screenshots-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-screenshots-title {
+            font-weight: 600;
+            color: #76b900;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .enhanced-screenshot-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .enhanced-screenshot-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(118, 185, 0, 0.2);
+        }
+
+        .enhanced-screenshot-header {
+            padding: 12px 15px;
+            background: rgba(118, 185, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-screenshot-url {
+            color: #9acd32;
+            font-size: 0.9rem;
+            word-break: break-all;
+            text-decoration: none;
+        }
+
+        .enhanced-screenshot-url:hover {
+            text-decoration: underline;
+        }
+
+        .enhanced-screenshot-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .enhanced-screenshot-image:hover {
+            transform: scale(1.02);
+        }
+
+        .enhanced-screenshot-timestamp {
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced Structured Data Section */
+        .enhanced-structured-data-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #76b900;
+        }
+
+        .enhanced-structured-data-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-structured-data-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .enhanced-records-count {
+            background: #76b900;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .enhanced-formatted-output {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .enhanced-formatted-output.csv {
+            white-space: pre;
+        }
+
+        .enhanced-formatted-output.json {
+            background: #f7fafc;
+        }
+
+        .enhanced-media-files-section {
+            background: #fff5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .enhanced-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .enhanced-media-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .enhanced-media-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .enhanced-media-filename {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .enhanced-media-type {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        .enhanced-download-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .enhanced-download-btn {
+            background: #76b900;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .enhanced-download-btn:hover {
+            background: #5a8a00;
+        }
+
+        .enhanced-download-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        /* New styles for enhanced results */
+        .enhanced-results-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .enhanced-results-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(118, 185, 0, 0.3);
+        }
+
+        .enhanced-results-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #76b900;
+        }
+
+        .enhanced-processing-time {
+            background: rgba(118, 185, 0, 0.2);
+            color: #76b900;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .enhanced-analysis-content {
+            line-height: 1.8;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+
+        .enhanced-analysis-content h1, .enhanced-analysis-content h2, .enhanced-analysis-content h3 {
+            color: #76b900;
+            margin: 25px 0 15px 0;
+        }
+
+        .enhanced-analysis-content ul, .enhanced-analysis-content ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-analysis-content li {
+            margin-bottom: 8px;
+        }
+
+        .enhanced-analysis-content strong {
+            color: #ffffff;
+        }
+
+        .enhanced-sources-analyzed {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-sources-title {
+            font-weight: 600;
+            color: #76b900;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-source-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #76b900;
+        }
+
+        .enhanced-source-url {
+            color: #9acd32;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .enhanced-source-url:hover {
+            text-decoration: underline;
+        }
+
+        /* Enhanced Screenshots Section */
+        .enhanced-screenshots-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-screenshots-title {
+            font-weight: 600;
+            color: #76b900;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .enhanced-screenshot-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .enhanced-screenshot-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(118, 185, 0, 0.2);
+        }
+
+        .enhanced-screenshot-header {
+            padding: 12px 15px;
+            background: rgba(118, 185, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-screenshot-url {
+            color: #9acd32;
+            font-size: 0.9rem;
+            word-break: break-all;
+            text-decoration: none;
+        }
+
+        .enhanced-screenshot-url:hover {
+            text-decoration: underline;
+        }
+
+        .enhanced-screenshot-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .enhanced-screenshot-image:hover {
+            transform: scale(1.02);
+        }
+
+        .enhanced-screenshot-timestamp {
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced Structured Data Section */
+        .enhanced-structured-data-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #76b900;
+        }
+
+        .enhanced-structured-data-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-structured-data-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .enhanced-records-count {
+            background: #76b900;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .enhanced-formatted-output {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .enhanced-formatted-output.csv {
+            white-space: pre;
+        }
+
+        .enhanced-formatted-output.json {
+            background: #f7fafc;
+        }
+
+        .enhanced-media-files-section {
+            background: #fff5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .enhanced-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .enhanced-media-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .enhanced-media-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .enhanced-media-filename {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .enhanced-media-type {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        .enhanced-download-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .enhanced-download-btn {
+            background: #76b900;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .enhanced-download-btn:hover {
+            background: #5a8a00;
+        }
+
+        .enhanced-download-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -656,11 +1353,19 @@
                     </div>
                 </div>
 
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    <i class="fas fa-rocket"></i>
-                    <span class="btn-text">Start Research</span>
-                    <i class="fas fa-spinner loading"></i>
-                </button>
+                <div class="submit-buttons">
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-rocket"></i>
+                        <span class="btn-text">Start Research</span>
+                        <i class="fas fa-spinner loading"></i>
+                    </button>
+                    
+                    <button type="button" class="submit-btn autonomous-btn" id="autonomousBtn">
+                        <i class="fas fa-robot"></i>
+                        <span class="btn-text">Autonomous Research</span>
+                        <i class="fas fa-spinner loading"></i>
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -846,6 +1551,108 @@
             resultsSection.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Display autonomous research results with agent decision-making highlighted
+        function displayAutonomousResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            const analysisContent = document.getElementById('analysisContent');
+            const sourcesAnalyzed = document.getElementById('sourcesAnalyzed');
+            const processingTime = document.getElementById('processingTime');
+            const screenshotsSection = document.getElementById('screenshotsSection');
+
+            // Show processing time with autonomous indicator
+            if (data.processing_time) {
+                processingTime.innerHTML = `
+                    <span class="autonomous-indicator">🤖 AI Agent</span> 
+                    ${data.processing_time.toFixed(2)}s
+                `;
+            }
+
+            // Format analysis with autonomous research header
+            analysisContent.innerHTML = `
+                <div class="autonomous-header">
+                    <div class="autonomous-title">
+                        <i class="fas fa-robot"></i> Autonomous Research Results
+                    </div>
+                    <div class="autonomous-subtitle">
+                        AI Agent made intelligent decisions using Llama-3.3-Nemotron-Super-49B-v1
+                    </div>
+                </div>
+                
+                <div class="analysis-content">
+                    ${formatAnalysisContent(data.result)}
+                </div>
+            `;
+
+            // Display autonomous actions taken (using vision_insights field)
+            if (data.vision_insights && data.vision_insights.length > 0) {
+                const actionsHtml = `
+                    <div class="autonomous-actions">
+                        <div class="actions-title">
+                            <i class="fas fa-cogs"></i> Autonomous Actions Taken
+                        </div>
+                        ${data.vision_insights.map((action, index) => `
+                            <div class="action-item">
+                                <div class="action-number">${index + 1}</div>
+                                <div class="action-description">${action}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                analysisContent.innerHTML += actionsHtml;
+            }
+
+            // Display sources with autonomous research context
+            if (data.sources_analyzed && data.sources_analyzed.length > 0) {
+                sourcesAnalyzed.innerHTML = `
+                    <div class="sources-title">
+                        <i class="fas fa-search"></i> Sources Autonomously Researched (${data.sources_analyzed.length})
+                    </div>
+                    <div class="autonomous-note">
+                        AI agent independently analyzed these sources and made decisions about data collection
+                    </div>
+                    ${data.sources_analyzed.map(url => `
+                        <div class="source-item">
+                            <a href="${url}" target="_blank" class="source-url">${url}</a>
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            // Show screenshots with autonomous context
+            if (data.screenshots && data.screenshots.length > 0 && document.getElementById('includeScreenshots').checked) {
+                screenshotsSection.innerHTML = `
+                    <div class="screenshots-title">
+                        <i class="fas fa-eye"></i> AI Agent Visual Analysis (${data.screenshots.length})
+                    </div>
+                    <div class="autonomous-note">
+                        Screenshots captured and analyzed autonomously by the AI agent
+                    </div>
+                    <div class="screenshots-grid">
+                        ${data.screenshots.map((screenshot, index) => `
+                            <div class="screenshot-item autonomous-screenshot">
+                                <div class="screenshot-header">
+                                    <span class="ai-analyzed-badge">🤖 AI Analyzed</span>
+                                    <a href="${screenshot.url}" target="_blank" class="screenshot-url">${screenshot.url}</a>
+                                </div>
+                                <img src="data:image/png;base64,${screenshot.image_base64}" alt="Screenshot analyzed by AI" class="screenshot-image" onclick="openModal('data:image/png;base64,${screenshot.image_base64}')">
+                                <div class="screenshot-timestamp">
+                                    Autonomously captured: ${new Date(screenshot.timestamp).toLocaleDateString()} ${new Date(screenshot.timestamp).toLocaleTimeString()}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                screenshotsSection.style.display = 'block';
+                screenshotsSection.classList.add('fade-in');
+            } else {
+                screenshotsSection.style.display = 'none';
+            }
+
+            // Show the results section
+            resultsSection.style.display = 'block';
+            resultsSection.classList.add('fade-in');
+        }
+
         // Handle form submission
         document.getElementById('researchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -906,6 +1713,66 @@
             }
         });
 
+        // Handle autonomous research button
+        document.getElementById('autonomousBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const query = document.getElementById('query').value.trim();
+            const maxTokens = parseInt(document.getElementById('maxTokens').value);
+            const includeScreenshots = document.getElementById('includeScreenshots').checked;
+            const autonomousBtn = document.getElementById('autonomousBtn');
+            const btnText = autonomousBtn.querySelector('.btn-text');
+
+            // Validation
+            if (!query) {
+                showError('Please enter a research goal for autonomous research');
+                return;
+            }
+
+            if (urlList.length === 0) {
+                showError('Please add at least one starting URL for autonomous research');
+                return;
+            }
+
+            // Show loading state
+            autonomousBtn.classList.add('loading');
+            autonomousBtn.disabled = true;
+            btnText.textContent = 'AI Agent Working...';
+
+            try {
+                const response = await fetch(`${API_BASE}/agent/autonomous-research`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        urls: urlList,
+                        max_tokens: maxTokens,
+                        include_screenshots: includeScreenshots
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayAutonomousResults(data);
+
+            } catch (error) {
+                console.error('Autonomous research failed:', error);
+                showError(`Autonomous research failed: ${error.message}`);
+            } finally {
+                // Reset loading state
+                autonomousBtn.classList.remove('loading');
+                autonomousBtn.disabled = false;
+                btnText.textContent = 'Autonomous Research';
+            }
+        });
+
         // Handle Enter key in URL input
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -946,6 +1813,254 @@
         document.querySelector('.screenshot-modal-close').addEventListener('click', () => {
             document.getElementById('screenshotModal').style.display = 'none';
         });
+
+        // Show/hide custom fields based on format selection
+        document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const customFieldsSection = document.getElementById('customFieldsSection');
+                if (this.value !== 'text') {
+                    customFieldsSection.style.display = 'block';
+                } else {
+                    customFieldsSection.style.display = 'none';
+                }
+            });
+        });
+
+        async function submitResearch() {
+            const query = document.getElementById('queryInput').value.trim();
+            const urls = document.getElementById('urlsInput').value.trim().split('\n').filter(url => url.trim());
+            const outputFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+            const extractMedia = document.getElementById('extractMedia').checked;
+            const includeScreenshots = document.getElementById('includeScreenshots').checked;
+            const maxTokens = parseInt(document.getElementById('maxTokens').value);
+            const customFields = document.getElementById('customFields').value.trim();
+
+            if (!query || urls.length === 0) {
+                alert('Please enter both a research query and at least one URL.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsDiv = document.getElementById('results');
+            
+            // Update button state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            resultsDiv.innerHTML = '<div class="loading-message"><i class="fas fa-spinner loading"></i>Analyzing content and extracting data...</div>';
+
+            try {
+                const response = await fetch('/agent/research', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        urls: urls,
+                        max_tokens: maxTokens,
+                        include_screenshots: includeScreenshots,
+                        output_format: outputFormat,
+                        extract_media: extractMedia,
+                        structured_fields: customFields ? customFields.split(',').map(f => f.trim()) : null
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Research request failed');
+                }
+
+                const data = await response.json();
+                displayEnhancedResults(data);
+
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i>Error: ${error.message}</div>`;
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        }
+
+        function displayEnhancedResults(data) {
+            currentData = data; // Store for downloads
+            const resultsDiv = document.getElementById('resultsSection');
+            let html = '<div class="enhanced-results-section">';
+            
+            // Header with processing info
+            html += `
+                <div class="enhanced-results-header">
+                    <h2><i class="fas fa-brain"></i>Research Results</h2>
+                    <div class="enhanced-processing-info">
+                        <span><i class="fas fa-clock"></i>${data.processing_time.toFixed(2)}s</span>
+                        <span><i class="fas fa-link"></i>${data.sources_analyzed.length} sources</span>
+                        ${data.output_format !== 'text' ? `<span><i class="fas fa-file-export"></i>${data.output_format.toUpperCase()}</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Main analysis
+            html += `
+                <div class="enhanced-analysis-section">
+                    <h3><i class="fas fa-lightbulb"></i>Analysis</h3>
+                    <div class="enhanced-analysis-content">${data.result}</div>
+                </div>
+            `;
+
+            // Structured data section
+            if (data.structured_data && data.structured_data.total_records > 0) {
+                html += `
+                    <div class="enhanced-structured-data-section">
+                        <div class="enhanced-structured-data-header">
+                            <h3 class="enhanced-structured-data-title"><i class="fas fa-table"></i>Structured Data</h3>
+                            <span class="enhanced-records-count">${data.structured_data.total_records} records</span>
+                        </div>
+                        <div class="enhanced-fields-info">
+                            <strong>Fields extracted:</strong> ${data.structured_data.fields.map(f => f.name).join(', ')}
+                        </div>
+                `;
+
+                // Add formatted output
+                if (data.formatted_output) {
+                    html += `
+                        <div class="enhanced-formatted-output ${data.output_format}">
+                            ${data.output_format === 'html_table' ? data.formatted_output : `<pre>${data.formatted_output}</pre>`}
+                        </div>
+                    `;
+
+                    // Add download buttons
+                    html += '<div class="enhanced-download-buttons">';
+                    if (data.output_format === 'csv') {
+                        html += '<button class="enhanced-download-btn" onclick="downloadData(\'csv\')"><i class="fas fa-download"></i>Download CSV</button>';
+                    } else if (data.output_format === 'excel') {
+                        html += '<button class="enhanced-download-btn" onclick="downloadData(\'excel\')"><i class="fas fa-download"></i>Download Excel</button>';
+                    } else if (data.output_format === 'json') {
+                        html += '<button class="enhanced-download-btn" onclick="downloadData(\'json\')"><i class="fas fa-download"></i>Download JSON</button>';
+                    }
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            // Media files section
+            if (data.media_files && data.media_files.length > 0) {
+                html += `
+                    <div class="enhanced-media-files-section">
+                        <h3><i class="fas fa-photo-video"></i>Media Files Found (${data.media_files.length})</h3>
+                        <div class="enhanced-media-grid">
+                `;
+
+                data.media_files.forEach(media => {
+                    const icon = media.media_type === 'image' ? 'fas fa-image' : 
+                                media.media_type === 'video' ? 'fas fa-video' : 'fas fa-file';
+                    
+                    html += `
+                        <div class="enhanced-media-item">
+                            <div class="enhanced-media-icon"><i class="${icon}"></i></div>
+                            <div class="enhanced-media-filename">${media.filename || 'Unknown'}</div>
+                            <div class="enhanced-media-type">${media.media_type}</div>
+                            <a href="${media.media_url}" target="_blank" class="enhanced-media-link">View</a>
+                        </div>
+                    `;
+                });
+
+                html += '</div></div>';
+            }
+
+            // Screenshots section (existing code)
+            if (data.screenshots && data.screenshots.length > 0) {
+                html += `
+                    <div class="enhanced-screenshots-section">
+                        <h3><i class="fas fa-camera"></i>Page Screenshots (${data.screenshots.length})</h3>
+                        <div class="enhanced-screenshots-grid">
+                `;
+
+                data.screenshots.forEach((screenshot, index) => {
+                    html += `
+                        <div class="enhanced-screenshot-item">
+                            <div class="enhanced-screenshot-header">
+                                <span class="enhanced-screenshot-title">Screenshot ${index + 1}</span>
+                                <span class="enhanced-screenshot-url">${screenshot.url}</span>
+                            </div>
+                            <img src="data:image/png;base64,${screenshot.image_base64}" 
+                                 alt="Screenshot of ${screenshot.url}" 
+                                 class="enhanced-screenshot-image"
+                                 onclick="openImageModal(this.src)">
+                        </div>
+                    `;
+                });
+
+                html += '</div></div>';
+            }
+
+            // Sources section
+            html += `
+                <div class="enhanced-sources-section">
+                    <h3><i class="fas fa-external-link-alt"></i>Sources Analyzed</h3>
+                    <ul class="enhanced-sources-list">
+            `;
+
+            data.sources_analyzed.forEach(url => {
+                html += `<li><a href="${url}" target="_blank">${url}</a></li>`;
+            });
+
+            html += '</ul></div></div>';
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Store current data for downloads
+        let currentData = null;
+
+        function downloadData(format) {
+            if (!currentData || !currentData.formatted_output) return;
+
+            let content, filename, mimeType;
+
+            switch (format) {
+                case 'csv':
+                    content = currentData.formatted_output;
+                    filename = 'research_results.csv';
+                    mimeType = 'text/csv';
+                    break;
+                case 'json':
+                    content = currentData.formatted_output;
+                    filename = 'research_results.json';
+                    mimeType = 'application/json';
+                    break;
+                case 'excel':
+                    // For Excel, the formatted_output is base64 encoded
+                    const byteCharacters = atob(currentData.formatted_output);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'research_results.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    return;
+            }
+
+            // For CSV and JSON
+            const blob = new Blob([content], { type: mimeType });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
     </script>
 </body>
 </html> 
