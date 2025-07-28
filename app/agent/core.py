@@ -7,6 +7,7 @@ import base64
 import json
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
+import asyncio
 from dotenv import load_dotenv
 
 from app.agent.browser_tools import extract_web_data
