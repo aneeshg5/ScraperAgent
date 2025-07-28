@@ -1,0 +1,301 @@
+"""
+Core agent orchestration for multimodal web research
+Integrates NVIDIA AI stack, browser automation, and vision analysis
+Enhanced for NVIDIA Hackathon with NeMo Toolkit integration
+"""
+import asyncio
+import logging
+import time
+from typing import List, Dict, Any, Optional
+import os
+import requests
+from dotenv import load_dotenv
+
+from app.agent.browser_tools import extract_web_data
+from app.agent.vision import analyze_screenshot
+from app.utils.memory import MemorySaver
+
+# Hackathon Enhancement: NeMo + LangChain Integration
+try:
+    from app.agent.nemo_langchain_agent import get_hackathon_agent
+    HACKATHON_AGENT_AVAILABLE = True
+except ImportError:
+    HACKATHON_AGENT_AVAILABLE = False
+    logging.warning("Hackathon agent not available - using standard implementation")
+
+load_dotenv()
+logger = logging.getLogger(__name__)
+
+# NVIDIA API Configuration
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
+NIM_ENDPOINT = os.getenv("NIM_ENDPOINT", "https://integrate.api.nvidia.com/v1/chat/completions")
+
+# Hackathon Configuration
+HACKATHON_MODE = os.getenv("HACKATHON_MODE", "false").lower() == "true"
+GPU_ACCELERATED = os.getenv("GPU_ACCELERATED", "false").lower() == "true"
+
+# Initialize memory saver
+memory_saver = MemorySaver()
+
+
+async def multimodal_research_agent(
+    query: str, 
+    urls: List[str],
+    max_tokens: int = 512,
+    include_screenshots: bool = True
+) -> Dict[str, Any]:
+    """
+    Main orchestration function for multimodal web research
+    Enhanced for NVIDIA Hackathon with optional NeMo Toolkit integration
+    
+    Args:
+        query: Research question or query
+        urls: List of URLs to analyze
+        max_tokens: Maximum tokens for LLM response
+        include_screenshots: Whether to capture and analyze screenshots
+        
+    Returns:
+        Dictionary containing analysis results and metadata
+    """
+    logger.info(f"🎯 Starting multimodal research for: {query}")
+    start_time = time.time()
+    
+    # Hackathon Enhancement: Use advanced agent if available
+    if HACKATHON_MODE and HACKATHON_AGENT_AVAILABLE:
+        try:
+            logger.info("🏆 Using NVIDIA Hackathon Enhanced Agent")
+            hackathon_agent = await get_hackathon_agent()
+            
+            options = {
+                "max_tokens": max_tokens,
+                "include_screenshots": include_screenshots,
+                "gpu_accelerated": GPU_ACCELERATED
+            }
+            
+            result = await hackathon_agent.research_query(query, urls, options)
+            
+            # Ensure compatibility with existing response format
+            if "analysis" not in result:
+                result["analysis"] = result.get("result", "Research completed with hackathon agent")
+            
+            logger.info("✅ Hackathon agent research completed")
+            return result
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Hackathon agent failed, falling back to standard: {e}")
+            # Continue with standard implementation below
+    
+    try:
+        # Step 1: Extract web data and capture screenshots
+        logger.info("🌐 Extracting web content and capturing screenshots...")
+        web_contents, screenshots = await extract_web_data(urls, capture_screenshots=include_screenshots)
+        
+        logger.info(f"📄 Extracted content from {len(web_contents)} sources")
+        
+        # Step 2: Analyze screenshots if available
+        vision_insights = []
+        if include_screenshots and screenshots:
+            logger.info("👁️ Analyzing screenshots with vision model...")
+            vision_tasks = [analyze_screenshot(screenshot) for screenshot in screenshots]
+            vision_results = await asyncio.gather(*vision_tasks, return_exceptions=True)
+            
+            for i, result in enumerate(vision_results):
+                if isinstance(result, Exception):
+                    logger.warning(f"Vision analysis failed for screenshot {i}: {result}")
+                else:
+                    vision_insights.append(result)
+        
+        # Step 3: Prepare context for NVIDIA Nemotron
+        logger.info("🧠 Preparing context for NVIDIA Nemotron reasoning...")
+        context = _prepare_multimodal_context(query, web_contents, vision_insights, urls)
+        
+        # Step 4: Generate analysis with NVIDIA Nemotron
+        logger.info("🚀 Generating analysis with NVIDIA Nemotron...")
+        analysis = await _generate_nemotron_analysis(context, max_tokens)
+        
+        # Step 5: Save to memory for future reference
+        await memory_saver.save_research_session(query, urls, analysis)
+        
+        processing_time = time.time() - start_time
+        logger.info(f"✅ Research completed in {processing_time:.2f} seconds")
+        
+        return {
+            "analysis": analysis,
+            "sources_analyzed": [url for url, content in zip(urls, web_contents) if content],
+            "vision_insights": vision_insights if vision_insights else None,
+            "processing_time": processing_time,
+            "context_tokens": len(context.split())
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Research agent failed: {str(e)}")
+        raise Exception(f"Research agent execution failed: {str(e)}")
+
+
+def _prepare_multimodal_context(
+    query: str, 
+    web_contents: List[str], 
+    vision_insights: List[str],
+    urls: List[str]
+) -> str:
+    """
+    Prepare combined context from text and visual data for the LLM
+    """
+    system_prompt = """You are an advanced multimodal web research agent powered by NVIDIA AI.
+    
+Your capabilities include:
+- Analyzing textual content from web sources
+- Understanding visual information from screenshots
+- Synthesizing insights across multiple modalities
+- Providing comprehensive, well-structured research summaries
+
+Instructions:
+1. Analyze all provided text and visual content
+2. Identify key insights, trends, and patterns
+3. Cross-reference information across sources
+4. Provide a comprehensive, well-structured summary
+5. Highlight any contradictions or discrepancies
+6. Include specific evidence and examples
+7. Format your response clearly with headings and bullet points where appropriate
+"""
+    
+    # Combine text content with vision insights
+    combined_context = f"{system_prompt}\n\nRESEARCH QUERY: {query}\n\n"
+    
+    # Add web content with source attribution
+    combined_context += "WEB CONTENT ANALYSIS:\n"
+    for i, (url, content) in enumerate(zip(urls, web_contents)):
+        if content:
+            combined_context += f"\nSource {i+1}: {url}\n"
+            combined_context += f"Content: {content[:2000]}...\n"  # Limit content length
+    
+    # Add vision insights
+    if vision_insights:
+        combined_context += "\nVISUAL CONTENT ANALYSIS:\n"
+        for i, insight in enumerate(vision_insights):
+            combined_context += f"\nScreenshot {i+1} Analysis: {insight}\n"
+    
+    combined_context += f"\nPlease provide a comprehensive analysis addressing: {query}"
+    
+    return combined_context
+
+
+async def _generate_nemotron_analysis(context: str, max_tokens: int) -> str:
+    """
+    Generate analysis using NVIDIA Nemotron via NIM API
+    """
+    if not NVIDIA_API_KEY:
+        logger.warning("⚠️ NVIDIA API key not configured, using mock response")
+        return _generate_mock_analysis(context)
+    
+    try:
+        headers = {
+            "Authorization": f"Bearer {NVIDIA_API_KEY}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+        
+        payload = {
+            "model": "meta/llama-3.1-405b-instruct",  # Using available model
+            "messages": [
+                {
+                    "role": "user",
+                    "content": context
+                }
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.1,
+            "top_p": 0.9,
+            "stream": False
+        }
+        
+        logger.info("📡 Sending request to NVIDIA NIM API...")
+        response = requests.post(NIM_ENDPOINT, headers=headers, json=payload, timeout=60)
+        
+        if response.status_code == 200:
+            result = response.json()
+            analysis = result["choices"][0]["message"]["content"]
+            logger.info("✅ Successfully received analysis from NVIDIA Nemotron")
+            return analysis
+        else:
+            logger.error(f"❌ NVIDIA API error: {response.status_code} - {response.text}")
+            return _generate_fallback_analysis(context)
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Network error with NVIDIA API: {str(e)}")
+        return _generate_fallback_analysis(context)
+    except Exception as e:
+        logger.error(f"❌ Unexpected error with NVIDIA API: {str(e)}")
+        return _generate_fallback_analysis(context)
+
+
+def _generate_mock_analysis(context: str) -> str:
+    """Generate a mock analysis for development/testing"""
+    return """
+# Multimodal Research Analysis
+
+## Executive Summary
+Based on the analysis of the provided web sources and visual content, here are the key findings:
+
+**Key Insights:**
+- Multiple sources were successfully analyzed for comprehensive coverage
+- Cross-modal information synthesis provides enhanced understanding
+- Visual content analysis supplements textual information effectively
+
+## Detailed Analysis
+
+### Content Overview
+The research query has been addressed through systematic analysis of:
+- Web-based textual content from multiple authoritative sources
+- Visual elements captured through screenshot analysis
+- Cross-referencing of information across different modalities
+
+### Key Findings
+1. **Primary Insights**: Core information extracted from textual sources
+2. **Visual Validation**: Screenshot analysis confirms and extends textual findings  
+3. **Synthesis**: Combined understanding provides comprehensive perspective
+
+### Recommendations
+- Continue monitoring sources for updates
+- Consider additional sources for broader perspective
+- Visual analysis provides valuable supplementary insights
+
+*Note: This is a development response. Configure NVIDIA API credentials for full functionality.*
+"""
+
+
+def _generate_fallback_analysis(context: str) -> str:
+    """Generate a fallback analysis when NVIDIA API is unavailable"""
+    return """
+# Research Analysis - Fallback Mode
+
+## Summary
+Analysis completed using fallback processing due to API connectivity issues.
+
+### Sources Processed
+- Multiple web sources were successfully extracted and processed
+- Content analysis was performed using available processing capabilities
+- Visual content was captured and prepared for analysis
+
+### Key Points
+- Web content extraction completed successfully
+- Screenshot capture and processing functional
+- Comprehensive data collection achieved
+
+### Next Steps
+1. Verify NVIDIA API connectivity for enhanced analysis
+2. Review extracted content for manual insights
+3. Consider alternative processing approaches if needed
+
+*Note: This is a fallback response. Full NVIDIA-powered analysis requires API connectivity.*
+"""
+
+
+async def get_research_history(limit: int = 10) -> List[Dict[str, Any]]:
+    """Retrieve recent research history"""
+    return await memory_saver.get_recent_sessions(limit)
+
+
+async def clear_research_history():
+    """Clear all research history"""
+    await memory_saver.clear_all_sessions() 

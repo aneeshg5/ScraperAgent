@@ -1,0 +1,133 @@
+# =============================================================================
+# Brev Platform Configuration - NVIDIA Hackathon
+# Multimodal Web Research Intelligence Agent
+# =============================================================================
+
+name: nvidia-multimodal-research-agent
+description: "NVIDIA-powered AI agent for intelligent web research and multimodal analysis"
+
+# Runtime Configuration
+runtime: nvidia/cuda:12.2-devel-ubuntu22.04
+python_version: "3.11"
+
+# GPU Requirements
+gpu: true
+gpu_count: 1
+gpu_memory: 16GB
+gpu_type: "A100"  # Request high-performance GPU for hackathon
+
+# System Resources
+memory: 32GB
+cpu_cores: 8
+storage: 100GB
+network: high_bandwidth
+
+# Environment Variables
+environment:
+  CUDA_VISIBLE_DEVICES: "0"
+  PYTORCH_CUDA_ALLOC_CONF: "max_split_size_mb:128"
+  TOKENIZERS_PARALLELISM: "false"
+  NVIDIA_VISIBLE_DEVICES: "all"
+  NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+
+# Port Configuration
+ports:
+  - 8000:8000    # Main application
+  - 8001:8001    # Monitoring dashboard
+  - 6006:6006    # TensorBoard (if needed)
+
+# Installation Steps
+install:
+  # System dependencies
+  - apt-get update && apt-get install -y curl wget git build-essential
+  - apt-get install -y ffmpeg libsm6 libxext6  # OpenCV dependencies
+  
+  # Python environment setup
+  - pip install --upgrade pip setuptools wheel
+  - pip install -r requirements-hackathon.txt
+  
+  # Browser setup for web automation
+  - playwright install chromium
+  - playwright install-deps chromium
+  
+  # NVIDIA specific setup
+  - pip install nvidia-ml-py3
+  - nvidia-smi  # Verify GPU access
+  
+  # NLP models (pre-download for faster startup)
+  - python -m spacy download en_core_web_sm
+  - python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+  
+  # Database initialization
+  - python -c "from app.utils.memory import MemorySaver; import asyncio; asyncio.run(MemorySaver().initialize())"
+
+# Health Checks
+health_check:
+  path: "/health"
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Startup Configuration
+startup:
+  # Pre-startup validations
+  - python -c "import torch; print(f'CUDA Available: {torch.cuda.is_available()}')"
+  - python -c "import torch; print(f'GPU Count: {torch.cuda.device_count()}')" 
+  - nvidia-smi --query-gpu=name,memory.total --format=csv
+  
+  # Launch application
+  - python start.py --gpu --hackathon-mode
+
+# Development Mode (for testing)
+dev_startup:
+  - python start.py --debug --reload
+
+# Monitoring & Logging
+monitoring:
+  enable_gpu_metrics: true
+  log_level: INFO
+  metrics_port: 8001
+
+# Security Configuration
+security:
+  enable_https: false  # Will be handled by Brev platform
+  cors_origins: ["*"]  # Hackathon-friendly for demos
+
+# Resource Limits
+limits:
+  max_memory_usage: "28GB"
+  max_gpu_memory: "14GB" 
+  max_cpu_usage: "7"
+  timeout: 3600  # 1 hour timeout for long research tasks
+
+# Backup & Recovery
+backup:
+  database_path: "./agent_memory.db"
+  logs_path: "./logs/"
+  models_cache: "./cache/"
+
+# Hackathon Specific Settings
+hackathon:
+  demo_mode: true
+  enable_mock_responses: true
+  preload_models: false  # Will be configured during event
+  evaluation_endpoints: 
+    - "/health"
+    - "/agent/research" 
+    - "/agent/vision"
+    - "/docs"
+
+# Performance Optimization
+performance:
+  enable_mixed_precision: true
+  optimize_for_inference: true
+  batch_processing: true
+  async_processing: true
+  cache_responses: true
+
+# Auto-scaling (if supported by Brev)
+scaling:
+  min_instances: 1
+  max_instances: 1  # Single instance for hackathon
+  scale_metric: "cpu_usage"
+  scale_threshold: 80 
